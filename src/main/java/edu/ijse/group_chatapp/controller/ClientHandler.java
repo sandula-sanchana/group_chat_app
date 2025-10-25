@@ -1,5 +1,8 @@
 package edu.ijse.group_chatapp.controller;
 
+import javafx.scene.image.Image;
+
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -27,8 +30,17 @@ public class ClientHandler implements Runnable {
        broadCaster.addDataOutputStream(dos);
        while (true){
            try {
-               String msg=dis.readUTF();
-               broadCaster.broadCastToAll(msg);
+               String type=dis.readUTF();
+               if(type.equals("TEXT")){
+                   String msg=dis.readUTF();
+                   broadCaster.broadCastToAll(type,msg);
+               }else if(type.equals("IMAGE")){
+                    int size=dis.readInt();
+                    byte[] imageBytes=new byte[size];
+                    dis.readFully(imageBytes);
+                    broadCaster.broadCastImages(type,size,imageBytes);
+               }
+
            } catch (IOException e) {
                throw new RuntimeException(e);
            }
